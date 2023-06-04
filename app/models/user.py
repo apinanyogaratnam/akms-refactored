@@ -5,7 +5,7 @@ from sqlalchemy import false
 from sqlalchemy.dialects.postgresql import TIMESTAMP
 
 
-class User(db.Model):
+class Users(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.Text, nullable=True)
@@ -17,4 +17,4 @@ class User(db.Model):
 
     @classmethod
     def query(cls):
-        return super(User, cls).query.filter_by(is_deleted=False)
+        return super(Users, cls).query.filter_by(is_deleted=False)

@@ -2,7 +2,8 @@ from flask_migrate import Migrate
 
 from app import create_app, db
 
-from app.models.user import User
+from app.models.user import Users
+from app.models.api_key import ApiKeys
 
 import os
 
