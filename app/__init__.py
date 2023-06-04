@@ -9,11 +9,28 @@ dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
 
-local = 'localhost'
-docker = 'host.docker.internal'
-current_host = local
+# hosts
+local_host = 'localhost'
+docker_host = 'host.docker.internal'
+production_host = os.environ.get('POSTGRES_HOST')
+
+# credentials
+local_user = 'postgres'
+production_user = os.environ.get('POSTGRES_USER')
+local_password = 'postgres'
+production_password = os.environ.get('POSTGRES_PASSWORD')
+local_db = 'postgres'
+production_db = os.environ.get('POSTGRES_DB')
+
+# set current credentials
+current_host = production_host
+current_user = production_user
+current_password = production_password
+current_db = production_db
+
+
 class Config:
-    SQLALCHEMY_DATABASE_URI = f"postgresql://postgres:postgres@{current_host}:5432/postgres" # noqa: E501
+    SQLALCHEMY_DATABASE_URI = f"postgresql://{current_user}:{current_password}@{current_host}:5432/{current_db}" # noqa: E501
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
