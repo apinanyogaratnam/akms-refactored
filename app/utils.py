@@ -17,6 +17,11 @@ class AlchemyEncoder(json.JSONEncoder):
         if 'registry' in response:
             del response['registry']
 
+        ignore_keys = ['query_active_users']
+        for key in ignore_keys:
+            if key in response:
+                del response[key]
+
         return response
 
     def default(self, obj):
