@@ -26,5 +26,14 @@ class ApiKeys(db.Model):
     )
 
     @classmethod
-    def query(cls):
-        return super(ApiKeys, cls).query.filter_by(is_deleted=False)
+    def query_active_api_keys(cls):
+        return cls.query.filter_by(is_deleted=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "name": self.name,
+            "description": self.description,
+            "created_at": self.created_at,
+        }

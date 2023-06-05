@@ -4,11 +4,25 @@ from flask import request
 from app import create_app, db
 
 from app.models.user import Users
+from app.models.api_key import ApiKeys
 
 from functools import wraps
 
+from akms_hash import hash_api_key
+from uuid import uuid4
 
-def authenticate(auth_type):
+import os
+
+
+def is_valid_api_key(api_key: str) -> bool:
+    hashed_api_key = hash_api_key(api_key, api_key)
+    result = (
+        ApiKeys.query_active_api_keys().filter_by(hashed_api_key=hashed_api_key).first()
+    )
+    return result is not None
+
+
+def authenticate(auth_type=None):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -24,6 +38,9 @@ def authenticate(auth_type):
                     "message": "Unauthorized",
                 }, 401
             else:
+                api_key = request.headers.get("X-API-KEY")
+                if api_key and is_valid_api_key(api_key):
+                    return func(*args, **kwargs)
                 return {
                     "status": 401,
                     "message": "Unauthorized",
@@ -34,10 +51,6 @@ def authenticate(auth_type):
     return decorator
 
 
-import os
-
-from app.utils import serialize
-
 app = create_app()
 migrate = Migrate(app, db)
 
@@ -47,13 +60,125 @@ def index():
     return {
         "pid": os.getpid(),
         "status": 200,
-    }
+    }, 200
 
 
 @app.route("/users")
 @authenticate("internal")
 def users():
     return {
-        "users": serialize(Users.query_active_users().all()),
+        "users": [user.to_dict() for user in Users.query_active_users().all()],
         "status": 200,
-    }
+    }, 200
+
+
+@app.route("/users/<int:user_id>/create-api-key", methods=["POST"])
+@authenticate("internal")
+def create_api_key(user_id: int) -> dict:
+    body = request.get_json()
+    generated_api_key = str(uuid4())
+    hashed_api_key = hash_api_key(generated_api_key, generated_api_key)
+    name = body.get("name")
+    description = body.get("description")
+
+    if not name:
+        return {
+            "status": 400,
+            "message": "Missing required field: name",
+        }, 400
+
+    api_key = ApiKeys(
+        user_id=user_id,
+        hashed_api_key=hashed_api_key,
+        name=name,
+        description=description,
+    )
+
+    db.session.add(api_key)
+    db.session.commit()
+
+    return {
+        "api_key": generated_api_key,
+        "status": 200,
+    }, 200
+
+
+@app.route("/users/<int:user_id>/api-keys")
+@authenticate("internal")
+def get_api_keys(user_id: int) -> dict:
+    api_keys = ApiKeys.query_active_api_keys().filter_by(user_id=user_id).all()
+    serialized_api_keys = [api_key.to_dict() for api_key in api_keys]
+    return {
+        "api_keys": serialized_api_keys,
+        "status": 200,
+    }, 200
+
+
+@app.route("/users/<int:user_id>/api-keys/<int:api_key_id>", methods=["PUT"])
+@authenticate("internal")
+def update_api_key(user_id: int, api_key_id: int) -> dict:
+    body = request.get_json()
+    name = body.get("name")
+    description = body.get("description")
+
+    if not name:
+        return {
+            "status": 400,
+            "message": "Missing required field: name",
+        }, 400
+
+    api_key = ApiKeys.query.filter_by(id=api_key_id, user_id=user_id).first()
+    api_key.name = name
+    api_key.description = description
+
+    db.session.commit()
+
+    return {
+        "api_key": api_key.to_dict(),
+        "status": 200,
+    }, 200
+
+
+@app.route("/users/<int:user_id>/api-keys/<int:api_key_id>", methods=["DELETE"])
+@authenticate("internal")
+def delete_api_key(user_id: int, api_key_id: int) -> dict:
+    api_key = ApiKeys.query.filter_by(id=api_key_id, user_id=user_id).first()
+    api_key.is_deleted = True
+
+    db.session.commit()
+
+    return {
+        "status": 200,
+    }, 200
+
+
+@app.route("/validate-api-key", methods=["POST"])
+def validate_api_key() -> dict:
+    body = request.get_json()
+    api_key = body.get("api_key")
+    user_id = body.get("user_id")
+
+    if not api_key or not user_id:
+        return {
+            "status": 400,
+            "message": "Missing required field: api_key or user_id",
+        }, 400
+
+    hashed_api_key = hash_api_key(api_key, api_key)
+
+    api_key = db.session.query(ApiKeys.id).filter_by(
+        user_id=user_id, hashed_api_key=hashed_api_key
+    ).first()
+
+    if api_key:
+        return {
+            "status": 200,
+            "message": "Valid API Key",
+            "is_valid": True,
+        }, 200
+
+    return {
+        "status": 401,
+        "message": "Unauthorized",
+        "is_valid": False,
+    }, 401
