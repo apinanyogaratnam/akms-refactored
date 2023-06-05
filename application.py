@@ -7,6 +7,8 @@ from app.models.api_key import ApiKeys
 
 import os
 
+from app.utils import serialize
+
 app = create_app()
 migrate = Migrate(app, db)
 
@@ -14,4 +16,10 @@ migrate = Migrate(app, db)
 def index():
     return {
         'pid': os.getpid(),
+    }
+
+@app.route('/users')
+def users():
+    return {
+        'users': serialize(Users.query_active_users().all()),
     }

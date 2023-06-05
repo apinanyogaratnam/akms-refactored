@@ -7,6 +7,7 @@ from sqlalchemy.dialects.postgresql import TIMESTAMP
 
 class Users(db.Model):
     __tablename__ = 'users'
+
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.Text, nullable=True)
     last_name = db.Column(db.Text, nullable=True)
@@ -16,5 +17,5 @@ class Users(db.Model):
     created_at = db.Column(TIMESTAMP(timezone=True), default=datetime.now(tz=timezone.utc), server_default=db.func.now(), nullable=False)
 
     @classmethod
-    def query(cls):
-        return super(Users, cls).query.filter_by(is_deleted=False)
+    def query_active_users(cls):
+        return cls.query.filter_by(is_deleted=False)
