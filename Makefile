@@ -4,3 +4,6 @@ start:
 format:
 	black .
 	ruff --fix .
+
+deploy:
+	vercel .
