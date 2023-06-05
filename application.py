@@ -16,6 +16,7 @@ migrate = Migrate(app, db)
 def index():
     return {
         'pid': os.getpid(),
+        'status': 200,
     }
 
 @app.route('/users')
