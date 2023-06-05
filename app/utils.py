@@ -5,10 +5,9 @@ from flask import Response as FlaskResponse
 
 
 class AlchemyEncoder(json.JSONEncoder):
-
     @staticmethod
     def clean_keys(response):
-        ignore_keys = {'query', 'query_class', 'registry', 'query_active_users'}
+        ignore_keys = {"query", "query_class", "registry", "query_active_users"}
         for key in ignore_keys:
             if key in response:
                 del response[key]
@@ -23,10 +22,12 @@ class AlchemyEncoder(json.JSONEncoder):
 
         # an SQLAlchemy class
         fields = {}
-        for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
+        for field in [x for x in dir(obj) if not x.startswith("_") and x != "metadata"]:
             data = obj.__getattribute__(field)
             try:
-                json.dumps(data) # this will fail on non-encodable values, like other classes
+                json.dumps(
+                    data
+                )  # this will fail on non-encodable values, like other classes
                 fields[field] = data
             except TypeError:
                 fields[field] = None
@@ -36,6 +37,7 @@ class AlchemyEncoder(json.JSONEncoder):
 
 class Response:
     """Response object wrapper of flask Response object"""
+
     def __new__(cls, response_data, status_code):
         """Constructor for Response class
         Args:
@@ -44,7 +46,9 @@ class Response:
         Returns:
             Response: Flask Response object
         """
-        return FlaskResponse(json.dumps(response_data), status=status_code, mimetype='application/json')
+        return FlaskResponse(
+            json.dumps(response_data), status=status_code, mimetype="application/json"
+        )
 
 
 def serialize(model):

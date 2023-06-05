@@ -3,3 +3,4 @@ start:
 
 format:
 	ruff --fix .
+	black .
