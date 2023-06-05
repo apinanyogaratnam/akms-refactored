@@ -8,16 +8,7 @@ class AlchemyEncoder(json.JSONEncoder):
 
     @staticmethod
     def clean_keys(response):
-        if 'query' in response:
-            del response['query']
-
-        if 'query_class' in response:
-            del response['query_class']
-
-        if 'registry' in response:
-            del response['registry']
-
-        ignore_keys = ['query_active_users']
+        ignore_keys = {'query', 'query_class', 'registry', 'query_active_users'}
         for key in ignore_keys:
             if key in response:
                 del response[key]

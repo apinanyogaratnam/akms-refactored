@@ -23,4 +23,5 @@ def index():
 def users():
     return {
         'users': serialize(Users.query_active_users().all()),
+        'status': 200,
     }
