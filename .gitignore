@@ -3,3 +3,4 @@ data
 *.pyc
 .ruff_cache
 __pycache__
+.vercel
