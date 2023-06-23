@@ -90,6 +90,13 @@ def create_user():
             "message": "Missing required field: name",
         }, 400
 
+    user = Users.query_active_users().filter_by(email=email).first()
+    if user:
+        return {
+            "status": 409,
+            "message": "User with this email already exists",
+        }, 409
+
     user = Users(email=email, name=name)
     db.session.add(user)
     db.session.commit()
