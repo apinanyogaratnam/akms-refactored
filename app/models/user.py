@@ -9,8 +9,7 @@ class Users(db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.Text, nullable=True)
-    last_name = db.Column(db.Text, nullable=True)
+    name = db.Column(db.Text, nullable=True)
     email = db.Column(db.Text, unique=True, nullable=False, index=True)
 
     is_deleted = db.Column(
@@ -22,6 +21,13 @@ class Users(db.Model):
         server_default=db.func.now(),
         nullable=False,
     )
+    updated_at = db.Column(
+        TIMESTAMP(timezone=True),
+        default=datetime.now(tz=timezone.utc),
+        server_default=db.func.now(),
+        onupdate=datetime.now(tz=timezone.utc),
+        nullable=False,
+    )
 
     @classmethod
     def query_active_users(cls):
@@ -30,8 +36,8 @@ class Users(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
+            "name": self.name,
             "email": self.email,
             "created_at": self.created_at,
+            "updated_at": self.updated_at,
         }

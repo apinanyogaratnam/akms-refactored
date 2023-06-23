@@ -72,6 +72,34 @@ def users():
     }, 200
 
 
+@app.post("/users")
+def create_user():
+    data = request.get_json()
+    email = data.get("email")
+    name = data.get("name")
+
+    if not email:
+        return {
+            "status": 400,
+            "message": "Missing required field: email",
+        }, 400
+
+    if not name:
+        return {
+            "status": 400,
+            "message": "Missing required field: name",
+        }, 400
+
+    user = Users(email=email, name=name)
+    db.session.add(user)
+    db.session.commit()
+
+    return {
+        "user": user.to_dict(),
+        "status": 200,
+    }, 200
+
+
 @app.route("/users/<int:user_id>/create-api-key", methods=["POST"])
 @authenticate("internal")
 def create_api_key(user_id: int) -> dict:

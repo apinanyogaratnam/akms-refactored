@@ -1,7 +1,9 @@
 {
   "cSpell.words": [
     "dockerized",
+    "dotenv",
     "getpid",
+    "onupdate",
     "sqlalchemy",
     "vercel",
     "verceldb"
