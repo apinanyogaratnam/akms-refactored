@@ -73,6 +73,7 @@ def users():
 
 
 @app.post("/users")
+@authenticate("internal")
 def create_user():
     data = request.get_json()
     email = data.get("email")
@@ -217,3 +218,4 @@ def validate_api_key() -> dict:
         "message": "Unauthorized",
         "is_valid": False,
     }, 401
+

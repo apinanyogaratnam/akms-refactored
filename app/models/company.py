@@ -1,19 +1,16 @@
 from datetime import datetime, timezone
+from sqlalchemy import TIMESTAMP, false
 from app import db
 
-from sqlalchemy import false
-from sqlalchemy.dialects.postgresql import TIMESTAMP
 
-from app.models.company import Projects
-
-
-class Users(db.Model):
-    __tablename__ = "users"
+class Projects(db.Model):
+    __tablename__ = "projects"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Text, nullable=True)
-    email = db.Column(db.Text, unique=True, nullable=False, index=True)
-    company_id = db.Column(db.Integer, db.ForeignKey(f"{Projects.__tablename__}.id"), nullable=True)
+    name = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    website = db.Column(db.Text, nullable=True)
+    logo_url = db.Column(db.Text, nullable=True)
 
     is_deleted = db.Column(
         db.Boolean, default=False, server_default=false(), nullable=False
@@ -33,15 +30,16 @@ class Users(db.Model):
     )
 
     @classmethod
-    def query_active_users(cls):
+    def query_active_projects(cls):
         return cls.query.filter_by(is_deleted=False)
 
     def to_dict(self):
         return {
             "id": self.id,
             "name": self.name,
-            "email": self.email,
+            "description": self.description,
+            "website": self.website,
+            "logo_url": self.logo_url,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
-            "project_id": self.company_id,
         }
