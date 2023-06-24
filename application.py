@@ -218,4 +218,3 @@ def validate_api_key() -> dict:
         "message": "Unauthorized",
         "is_valid": False,
     }, 401
-
