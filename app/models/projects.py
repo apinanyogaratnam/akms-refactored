@@ -6,7 +6,7 @@ from app import db
 class Projects(db.Model):
     __tablename__ = "projects"
 
-    id = db.Column(UUID(as_uuid=True), primary_key=True, unique=True, nullable=False, server_default=db.text("uuid_generate_v4()"))
+    id = db.Column(UUID(as_uuid=True), primary_key=True, unique=True, nullable=False, server_default=db.text("gen_random_uuid()"))
     name = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=True)
     website = db.Column(db.Text, nullable=True)
