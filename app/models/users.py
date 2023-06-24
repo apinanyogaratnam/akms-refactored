@@ -4,8 +4,6 @@ from app import db
 from sqlalchemy import false
 from sqlalchemy.dialects.postgresql import TIMESTAMP
 
-from app.models.projects import Projects
-
 
 class Users(db.Model):
     __tablename__ = "users"
