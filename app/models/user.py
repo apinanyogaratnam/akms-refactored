@@ -4,7 +4,7 @@ from app import db
 from sqlalchemy import false
 from sqlalchemy.dialects.postgresql import TIMESTAMP
 
-from app.models.company import Projects
+from app.models.projects import Projects
 
 
 class Users(db.Model):
@@ -13,7 +13,6 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=True)
     email = db.Column(db.Text, unique=True, nullable=False, index=True)
-    company_id = db.Column(db.Integer, db.ForeignKey(f"{Projects.__tablename__}.id"), nullable=True)
 
     is_deleted = db.Column(
         db.Boolean, default=False, server_default=false(), nullable=False

@@ -4,6 +4,8 @@ from app import db
 from sqlalchemy import false
 from sqlalchemy.dialects.postgresql import TIMESTAMP
 
+from app.models.projects import Projects
+
 
 class ApiKeys(db.Model):
     __tablename__ = "api_keys"
@@ -14,6 +16,7 @@ class ApiKeys(db.Model):
     hashed_api_key = db.Column(db.Text, nullable=False, index=True)
     name = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=True)
+    project_id = db.Column(db.Integer, db.ForeignKey(f"{Projects.__tablename__}.id"), nullable=True)
 
     is_deleted = db.Column(
         db.Boolean, default=False, server_default=false(), nullable=False
