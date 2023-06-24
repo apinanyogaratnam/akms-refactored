@@ -3,8 +3,8 @@ from flask import request
 
 from app import create_app, db
 
-from app.models.user import Users
-from app.models.api_key import ApiKeys
+from app.models.users import Users
+from app.models.api_keys import ApiKeys
 
 from functools import wraps
 
