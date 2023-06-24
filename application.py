@@ -63,6 +63,22 @@ def index():
     }, 200
 
 
+@app.get("/user/<string:email>")
+@authenticate("internal")
+def get_user(email: str) -> dict:
+    user = Users.query_active_users().filter_by(email=email).first()
+    if not user:
+        return {
+            "status": 204,
+            "message": "User not found",
+        }, 204
+
+    return {
+        "user": user.to_dict(),
+        "status": 200,
+    }, 200
+
+
 @app.route("/users")
 @authenticate("internal")
 def users():
