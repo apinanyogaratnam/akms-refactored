@@ -1,5 +1,6 @@
 from flask_migrate import Migrate
 from flask import request
+from sqlalchemy import func
 
 from app import create_app, db
 
@@ -275,7 +276,16 @@ def create_project(user_id: int) -> dict:
 @app.get("/users/<int:user_id>/projects")
 def get_projects(user_id: int) -> dict:
     projects = (
-        db.session.query(Projects)
+        db.session.query(
+            Projects.id,
+            Projects.name,
+            Projects.description,
+            Projects.website,
+            Projects.logo_url,
+            func.extract("epoch", Projects.created_at).label("created_at"),
+            func.extract("epoch", Projects.updated_at).label("updated_at"),
+            Projects.is_deleted,
+        )
             .join(UserProjects)
             .join(Users)
             .filter(UserProjects.user_id == user_id)
@@ -284,7 +294,20 @@ def get_projects(user_id: int) -> dict:
             .all()
     )
 
+    projects = [
+        {
+            "id": project.id,
+            "name": project.name,
+            "description": project.description,
+            "website": project.website,
+            "logo_url": project.logo_url,
+            "created_at": project.created_at,
+            "updated_at": project.updated_at,
+            "is_deleted": project.is_deleted,
+        } for project in projects
+    ]
+
     return {
-        "projects": [project.to_dict() for project in projects],
+        "projects": projects,
         "status": 200,
     }, 200
