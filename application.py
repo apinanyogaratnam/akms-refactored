@@ -5,6 +5,8 @@ from app import create_app, db
 
 from app.models.users import Users
 from app.models.api_keys import ApiKeys
+from app.models.projects import Projects
+from app.models.user_projects import UserProjects
 
 from functools import wraps
 

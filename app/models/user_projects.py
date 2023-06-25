@@ -1,3 +1,4 @@
+from sqlalchemy import UUID
 from app import db
 from app.models.projects import Projects
 from app.models.users import Users
@@ -10,7 +11,7 @@ class UserProjects(db.Model):
     user_id = db.Column(
         db.Integer, db.ForeignKey(f"{Users.__tablename__}.id"), nullable=False, index=True
     )
-    project_id = db.Column(db.Integer, db.ForeignKey(f"{Projects.__tablename__}.id"), nullable=False, index=True)
+    project_id = db.Column(UUID(as_uuid=True), db.ForeignKey(f"{Projects.__tablename__}.id"), nullable=False, index=True)
 
     def to_dict(self):
         return {
