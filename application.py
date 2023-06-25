@@ -69,6 +69,8 @@ def get_user(email: str) -> dict:
     user = Users.query_active_users().filter_by(email=email).first()
     if not user:
         return {
+            "data": "hi",
+            "user": None,
             "status": 204,
             "message": "User not found",
         }, 204
