@@ -5,6 +5,7 @@
     "dotenv",
     "getpid",
     "onupdate",
+    "outerjoin",
     "sqlalchemy",
     "vercel",
     "verceldb"

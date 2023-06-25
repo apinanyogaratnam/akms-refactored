@@ -275,6 +275,15 @@ def create_project(user_id: int) -> dict:
 
 @app.get("/users/<int:user_id>/projects")
 def get_projects(user_id: int) -> dict:
+    subquery = (
+        db.session.query(
+            UserProjects.project_id, db.func.array_agg(Users.profile_image)
+        )
+        .join(Users, Users.id == UserProjects.user_id)
+        .group_by(UserProjects.project_id)
+        .subquery()
+    )
+
     projects = (
         db.session.query(
             Projects.id,
@@ -285,10 +294,10 @@ def get_projects(user_id: int) -> dict:
             func.extract("epoch", Projects.created_at).label("created_at"),
             func.extract("epoch", Projects.updated_at).label("updated_at"),
             Projects.is_deleted,
+            subquery.c.array_agg.label("user_profile_image_urls"),
         )
-            .join(UserProjects)
-            .join(Users)
-            .filter(UserProjects.user_id == user_id)
+            .outerjoin(subquery, Projects.id == subquery.c.project_id)
+            .filter(Projects.user_id == user_id)
             .filter(Projects.is_deleted == False)
             .order_by(Projects.created_at.desc())
             .all()
@@ -304,6 +313,7 @@ def get_projects(user_id: int) -> dict:
             "created_at": project.created_at,
             "updated_at": project.updated_at,
             "is_deleted": project.is_deleted,
+            "user_profile_image_urls": project.user_profile_image_urls,
         } for project in projects
     ]
 

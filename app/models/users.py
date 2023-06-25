@@ -11,6 +11,7 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=True)
     email = db.Column(db.Text, unique=True, nullable=False, index=True)
+    profile_image_url = db.Column(db.Text, nullable=True)
 
     is_deleted = db.Column(
         db.Boolean, default=False, server_default=false(), nullable=False
