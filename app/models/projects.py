@@ -13,13 +13,14 @@ class Projects(db.Model):
     logo_url = db.Column(db.Text, nullable=True)
 
     is_deleted = db.Column(
-        db.Boolean, default=False, server_default=false(), nullable=False
+        db.Boolean, default=False, server_default=false(), nullable=False, index=True
     )
     created_at = db.Column(
         TIMESTAMP(timezone=True),
         default=datetime.now(tz=timezone.utc),
         server_default=db.func.now(),
         nullable=False,
+        index=True,
     )
     updated_at = db.Column(
         TIMESTAMP(timezone=True),
