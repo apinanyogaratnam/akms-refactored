@@ -63,7 +63,7 @@ def index():
     }, 200
 
 
-@app.get("/user/<string:email>")
+@app.get("/users/<string:email>")
 @authenticate("internal")
 def get_user(email: str) -> dict:
     user = Users.query_active_users().filter_by(email=email).first()
