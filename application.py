@@ -277,7 +277,10 @@ def get_projects(user_id: int) -> dict:
     projects = (
         db.session.query(Projects)
             .join(UserProjects)
+            .join(Users)
             .filter(UserProjects.user_id == user_id)
+            .filter(Projects.is_deleted == False)
+            .order_by(Projects.created_at.desc())
             .all()
     )
 
