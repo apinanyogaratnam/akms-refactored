@@ -277,7 +277,7 @@ def create_project(user_id: int) -> dict:
 def get_projects(user_id: int) -> dict:
     subquery = (
         db.session.query(
-            UserProjects.project_id, db.func.array_agg(Users.profile_image)
+            UserProjects.project_id, db.func.array_agg(Users.profile_image_url)
         )
         .join(Users, Users.id == UserProjects.user_id)
         .group_by(UserProjects.project_id)
