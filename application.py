@@ -268,3 +268,18 @@ def create_project(user_id: int) -> dict:
         "project": project.to_dict(),
         "status": 200,
     }, 200
+
+
+@app.get("/users/<int:user_id>/projects")
+def get_projects(user_id: int) -> dict:
+    projects = (
+        db.session.query(Projects)
+            .join(UserProjects)
+            .filter(UserProjects.user_id == user_id)
+            .all()
+    )
+
+    return {
+        "projects": [project.to_dict() for project in projects],
+        "status": 200,
+    }, 200
