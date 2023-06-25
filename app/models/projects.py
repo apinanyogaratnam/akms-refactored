@@ -12,7 +12,7 @@ class Projects(db.Model):
     description = db.Column(db.Text, nullable=True)
     website = db.Column(db.Text, nullable=True)
     logo_url = db.Column(db.Text, nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(f"{Users.__tablename__}.id"), nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(f"{Users.__tablename__}.id"), nullable=True, index=True)
 
     is_deleted = db.Column(
         db.Boolean, default=False, server_default=false(), nullable=False, index=True
