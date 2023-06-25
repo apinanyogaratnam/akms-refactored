@@ -237,3 +237,34 @@ def validate_api_key() -> dict:
         "message": "Unauthorized",
         "is_valid": False,
     }, 401
+
+
+@app.post("/users/<int:user_id>/projects")
+def create_project(user_id: int) -> dict:
+    body = request.get_json()
+    name = body.get("name")
+    description = body.get("description")
+    website = body.get("website")
+    logo_url = body.get("logo_url")
+
+    if not name or not description:
+        return {
+            "status": 400,
+            "message": "Missing required fields: name and description",
+        }, 400
+
+    project = Projects(name=name, description=description, website=website, logo_url=logo_url)
+
+    db.session.add(project)
+
+    db.session.flush()
+
+    user_project = UserProjects(user_id=user_id, project_id=project.id)
+
+    db.session.add(user_project)
+
+
+    return {
+        "project": project.to_dict(),
+        "status": 200,
+    }, 200
