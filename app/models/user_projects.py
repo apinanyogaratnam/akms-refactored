@@ -1,4 +1,4 @@
-from sqlalchemy import UUID
+from sqlalchemy import UUID, UniqueConstraint
 from app import db
 from app.models.projects import Projects
 from app.models.users import Users
@@ -12,6 +12,8 @@ class UserProjects(db.Model):
         db.Integer, db.ForeignKey(f"{Users.__tablename__}.id"), nullable=False, index=True
     )
     project_id = db.Column(UUID(as_uuid=True), db.ForeignKey(f"{Projects.__tablename__}.id"), nullable=False, index=True)
+
+    UniqueConstraint(user_id, project_id, name="user_projects_user_id_project_id_key")
 
     def to_dict(self):
         return {
