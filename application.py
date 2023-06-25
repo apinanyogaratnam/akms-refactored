@@ -263,6 +263,8 @@ def create_project(user_id: int) -> dict:
 
     db.session.add(user_project)
 
+    db.session.commit()
+
 
     return {
         "project": project.to_dict(),
