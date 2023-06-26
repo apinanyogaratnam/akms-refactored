@@ -136,18 +136,27 @@ def create_api_key(user_id: int) -> dict:
     hashed_api_key = hash_api_key(generated_api_key, generated_api_key)
     name = body.get("name")
     description = body.get("description")
+    project_id = body.get("project_id")
 
-    if not name:
+    if not name or not project_id:
         return {
             "status": 400,
-            "message": "Missing required field: name",
+            "message": "Missing required fields: name and project_id",
         }, 400
+
+    project = db.session.query(Projects).filter_by(id=project_id).first()
+    if not project:
+        return {
+            "status": 404,
+            "message": "Project not found",
+        }, 204
 
     api_key = ApiKeys(
         user_id=user_id,
         hashed_api_key=hashed_api_key,
         name=name,
         description=description,
+        project_id=project_id,
     )
 
     db.session.add(api_key)
@@ -159,10 +168,10 @@ def create_api_key(user_id: int) -> dict:
     }, 200
 
 
-@app.route("/users/<int:user_id>/api-keys")
+@app.route("/users/<int:user_id>/projects/<string:project_id>/api-keys")
 @authenticate("internal")
-def get_api_keys(user_id: int) -> dict:
-    api_keys = ApiKeys.query_active_api_keys().filter_by(user_id=user_id).all()
+def get_api_keys(user_id: int, project_id: str) -> dict:
+    api_keys = ApiKeys.query_active_api_keys().filter_by(user_id=user_id, project_id=project_id).all()
     serialized_api_keys = [api_key.to_dict() for api_key in api_keys]
     return {
         "api_keys": serialized_api_keys,
