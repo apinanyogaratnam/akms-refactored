@@ -254,7 +254,7 @@ def create_project(user_id: int) -> dict:
             "message": "Missing required fields: name and description",
         }, 400
 
-    project = Projects(name=name, description=description, website=website, logo_url=logo_url)
+    project = Projects(name=name, description=description, website=website, logo_url=logo_url, user_id=user_id)
 
     db.session.add(project)
 
@@ -323,14 +323,14 @@ def get_projects(user_id: int) -> dict:
     }, 200
 
 
-@app.delete("/users/<int:user_id>/projects/<int:project_id>")
-def delete_project(user_id: int, project_id: int) -> dict:
+@app.delete("/users/<int:user_id>/projects/<string:project_id>")
+def delete_project(user_id: int, project_id: str) -> dict:
     project = Projects.query.filter_by(id=project_id, user_id=user_id).first()
     if not project:
         return {
             "status": 404,
             "message": "Project not found",
-        }, 404
+        }, 400
 
     project.is_deleted = True
 
