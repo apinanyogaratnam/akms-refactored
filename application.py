@@ -321,3 +321,21 @@ def get_projects(user_id: int) -> dict:
         "projects": projects,
         "status": 200,
     }, 200
+
+
+@app.delete("/users/<int:user_id>/projects/<int:project_id>")
+def delete_project(user_id: int, project_id: int) -> dict:
+    project = Projects.query.filter_by(id=project_id, user_id=user_id).first()
+    if not project:
+        return {
+            "status": 404,
+            "message": "Project not found",
+        }, 404
+
+    project.is_deleted = True
+
+    db.session.commit()
+
+    return {
+        "status": 200,
+    }, 200
